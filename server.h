@@ -9,7 +9,6 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-void doStuff(int);
 
 void error(const char *msg) {
     perror(msg);
