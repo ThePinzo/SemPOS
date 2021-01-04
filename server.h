@@ -5,6 +5,17 @@
 #ifndef SEMPRACA_SERVER_H
 #define SEMPRACA_SERVER_H
 
-#endif //SEMPRACA_SERVER_H
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
 
+void doStuff(int);
+
+void error(const char *msg) {
+    perror(msg);
+    exit(1);
+};
+
+
+#endif
 
