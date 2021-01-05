@@ -5,6 +5,9 @@
 #ifndef SEMPRACA_CLIENT_H
 #define SEMPRACA_CLIENT_H
 
+#define N 1024
+#define NB_CMDS 11
+
 #define OPEN 0
 #define CD 1
 #define MKD 2
@@ -18,8 +21,12 @@
 #define HELP 10
 
 
+const char *PROMPT = "ftp>";
 
+void prompt(void);
 
+void connect(char *, char *, char *);
+void help(void);
 
 
 #endif //SEMPRACA_CLIENT_H

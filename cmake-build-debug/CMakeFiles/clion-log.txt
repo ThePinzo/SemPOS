@@ -1,11 +1,6 @@
 /usr/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /tmp/tmp.QvcAxihe7Q
--- The C compiler identification is GNU 6.3.0
--- Check for working C compiler: /usr/bin/cc
--- Check for working C compiler: /usr/bin/cc -- works
--- Detecting C compiler ABI info
--- Detecting C compiler ABI info - done
--- Detecting C compile features
--- Detecting C compile features - done
 -- Configuring done
+CMake Error: CMake can not determine linker language for target: semPraca
+CMake Error: Cannot determine link language for target "semPraca".
 -- Generating done
 -- Build files have been written to: /tmp/tmp.QvcAxihe7Q/cmake-build-debug
