@@ -1,6 +1,4 @@
 /usr/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /tmp/tmp.QvcAxihe7Q
 -- Configuring done
-CMake Error: CMake can not determine linker language for target: semPraca
-CMake Error: Cannot determine link language for target "semPraca".
 -- Generating done
 -- Build files have been written to: /tmp/tmp.QvcAxihe7Q/cmake-build-debug

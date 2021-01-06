@@ -78,7 +78,13 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/tmp/tmp.QvcAxihe7Q/client.h">
+		<Unit filename="/tmp/tmp.QvcAxihe7Q/klient.c">
+			<Option target="semPraca"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.QvcAxihe7Q/klient.h">
+			<Option target="semPraca"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.QvcAxihe7Q/test.c">
 			<Option target="semPraca"/>
 		</Unit>
 		<Unit filename="/tmp/tmp.QvcAxihe7Q/CMakeLists.txt">

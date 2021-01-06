@@ -123,6 +123,60 @@ semPraca/fast:
 	$(MAKE) -f CMakeFiles/semPraca.dir/build.make CMakeFiles/semPraca.dir/build
 .PHONY : semPraca/fast
 
+klient.o: klient.c.o
+
+.PHONY : klient.o
+
+# target to build an object file
+klient.c.o:
+	$(MAKE) -f CMakeFiles/semPraca.dir/build.make CMakeFiles/semPraca.dir/klient.c.o
+.PHONY : klient.c.o
+
+klient.i: klient.c.i
+
+.PHONY : klient.i
+
+# target to preprocess a source file
+klient.c.i:
+	$(MAKE) -f CMakeFiles/semPraca.dir/build.make CMakeFiles/semPraca.dir/klient.c.i
+.PHONY : klient.c.i
+
+klient.s: klient.c.s
+
+.PHONY : klient.s
+
+# target to generate assembly for a file
+klient.c.s:
+	$(MAKE) -f CMakeFiles/semPraca.dir/build.make CMakeFiles/semPraca.dir/klient.c.s
+.PHONY : klient.c.s
+
+test.o: test.c.o
+
+.PHONY : test.o
+
+# target to build an object file
+test.c.o:
+	$(MAKE) -f CMakeFiles/semPraca.dir/build.make CMakeFiles/semPraca.dir/test.c.o
+.PHONY : test.c.o
+
+test.i: test.c.i
+
+.PHONY : test.i
+
+# target to preprocess a source file
+test.c.i:
+	$(MAKE) -f CMakeFiles/semPraca.dir/build.make CMakeFiles/semPraca.dir/test.c.i
+.PHONY : test.c.i
+
+test.s: test.c.s
+
+.PHONY : test.s
+
+# target to generate assembly for a file
+test.c.s:
+	$(MAKE) -f CMakeFiles/semPraca.dir/build.make CMakeFiles/semPraca.dir/test.c.s
+.PHONY : test.c.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -132,6 +186,12 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... semPraca"
+	@echo "... klient.o"
+	@echo "... klient.i"
+	@echo "... klient.s"
+	@echo "... test.o"
+	@echo "... test.i"
+	@echo "... test.s"
 .PHONY : help
 
 

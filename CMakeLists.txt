@@ -5,5 +5,4 @@ set(CMAKE_C_STANDARD 99)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
 
-
-add_executable(semPraca client.h client.c)
+add_executable(semPraca klient.h klient.c)
