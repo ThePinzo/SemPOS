@@ -1,6 +1,5 @@
 file(REMOVE_RECURSE
   "CMakeFiles/semPraca.dir/klient.c.o"
-  "CMakeFiles/semPraca.dir/test.c.o"
   "semPraca.pdb"
   "semPraca"
 )

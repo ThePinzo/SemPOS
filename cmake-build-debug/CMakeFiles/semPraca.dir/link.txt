@@ -1,1 +1,1 @@
-/usr/bin/cc   -pthread -g   CMakeFiles/semPraca.dir/klient.c.o CMakeFiles/semPraca.dir/test.c.o  -o semPraca 
+/usr/bin/cc   -pthread -g   CMakeFiles/semPraca.dir/klient.c.o  -o semPraca 

@@ -19,7 +19,7 @@
 #define N 1024
 #define NB_CMDS 11
 #define SERVER_PORT 21
-#define OPEN 0  //TEORETICKY POJDE/bez hesla zatial/
+#define OPEN 0  //bez hesla/
 #define CD 1    //kk
 #define MKD 2   //kk
 #define RMD 3   //kk
@@ -53,5 +53,10 @@ void del(char *);
 void mkd(char *);
 
 void rmd(char *);
+
+void get(char *);
+
+void put(char *);
+
 
 #endif //SEMPRACA_KLIENT_H

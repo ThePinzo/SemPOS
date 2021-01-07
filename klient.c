@@ -9,15 +9,20 @@ static char *prikazy[NB_CMDS] = {
         "open", "cd", "mkd", "rmd", "quit", "dir", "get", "put", "pwd", "del", "help"
 };
 int sd = 0;
+int data_sock = 0;
 int connected = 0;
 
 
 int main(int argc, char *argv[]) {
     char buffer[N], *param;
+    char uname[N], pass[N];
     int j = 0;
 
     do {
         memset(buffer, '\0', N * sizeof(char));
+        memset(uname, '\0', N * sizeof(char));
+        memset(pass, '\0', N * sizeof(char));
+
         prompt();
         gets(buffer);
 
@@ -33,8 +38,18 @@ int main(int argc, char *argv[]) {
             }
         switch (j) {
             case (OPEN):
-                if (connected == 1) printf("You are already connected\n");
-                else pripojit(argv[1], argv[2], argv[3]);
+                if (strcmp(buffer, "") != 0) {
+                    if (connected == 1) printf("You are already connected\n");
+                    else {
+                        printf("Username: ");
+                        gets(uname);
+                        if (strcmp(uname, "anonymous") != 0) {
+                            printf("Password: ");
+                            gets(pass);
+                        }
+                        pripojit("frios2.fri.uniza.sk", uname, pass);
+                    }
+                }
                 break;
             case (PWD):
                 if (connected == 0) {
@@ -81,7 +96,25 @@ int main(int argc, char *argv[]) {
                     del(param);
                 }
                 break;
+            case (GET):
+                if (connected == 0) {
+                    printf("You are not connected\n");
+                } else {
+                    get(param);
+
+                }
+                break;
+            case (PUT):
+                if (connected == 0) {
+                    printf("You are not connected\n");
+                } else {
+                    put(param);
+                }
+                break;
             case (HELP):
+                help();
+                break;
+            default:
                 help();
                 break;
         }
@@ -115,9 +148,9 @@ void prompt(void) {
 
 void pwd(void) {
     char buffer[N];
-    char *pwd = "XPWD \n";
+    char *pwd = "XPWD\r\n";
 
-    if (send(sd, pwd, strlen(pwd) + 1, 0) < 0) {
+    if (send(sd, pwd, strlen(pwd), 0) < 0) {
         perror("Error sending");
         exit(2);
     }
@@ -151,13 +184,11 @@ void cd(char *repo) {
 }
 
 void quit(void) {
-    char quit[N];
+    char *quit = "QUIT\r\n";
     char buffer[N];
-    memset(quit, '\0', N * sizeof(char));
-    strcat(quit, "QUIT \n");
 
     if (connected == 1)
-        if (send(sd, quit, strlen(quit) + 1, 0) < 0) {
+        if (send(sd, quit, strlen(quit), 0) < 0) {
             perror("Error sending");
             exit(2);
         }
@@ -174,17 +205,32 @@ void quit(void) {
 }
 
 void dir(void) {
-    char *dir = "DIR \n";
+    char *pasv = "PORT\r\n";
+    char *dir = "LIST\r\n";
     char buffer[N];
-    if (send(sd, dir, strlen(dir) + 1, 0) < 0) {
+
+    if (send(sd, pasv, strlen(pasv), 0) < 0) {
         perror("Error sending");
         exit(2);
     }
+
     memset(buffer, '\0', N * sizeof(char));
     if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
         perror("Error recieving");
         exit(5);
-    } else printf("'%s' \n", buffer);
+    } else printf("%s \n", buffer);
+
+    if (send(sd, dir, strlen(dir), 0) < 0) {
+        perror("Error sending");
+        exit(2);
+    }
+
+    bzero(buffer, sizeof(buffer));
+
+    if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
+        perror("Error receiving");
+        exit(5);
+    } else printf("%s \n", buffer);
 
 }
 
@@ -233,23 +279,21 @@ void mkd(char *directory) {
 void pripojit(char *host_serv, char *uname, char *password) {
     struct sockaddr_in to;
     struct hostent *host;
-    char *server_port = "21";
-    int tolen, len;
+    int tolen;
     char buffer[N];
-
     char user[N];
     char pass[N];
 
     memset(user, '\0', N * sizeof(char));
     memset(pass, '\0', N * sizeof(char));
 
-
-    to.sin_family = AF_INET;
-    to.sin_port = htons(SERVER_PORT);
-    host = gethostbyname(host_serv);
-    memcpy(&(to.sin_addr), host->h_addr, sizeof(to.sin_addr));
-    tolen = sizeof(to);
     sd = socket(AF_INET, SOCK_STREAM, 0);
+    to.sin_family = AF_INET;
+    to.sin_addr.s_addr = htons(INADDR_ANY);
+    host = gethostbyname(host_serv);
+    memcpy(&(to.sin_addr), host->h_addr, host->h_length);
+    tolen = sizeof(to);
+    to.sin_port = htons(SERVER_PORT);
 
 
     if (connect(sd, (struct sockaddr *) &to, tolen) < 0) {
@@ -264,37 +308,55 @@ void pripojit(char *host_serv, char *uname, char *password) {
     } else { printf("%s \n", buffer); }
 
     //USER
-    strcat(user, "user ");
-    strcat(user, uname);
-    strcat(user, "\n");
+    if (strcmp(uname, "anonymous") != 0) {
+        strcat(user, "user ");
+        strcat(user, uname);
+        strcat(user, "\r\n");
+
+        if (send(sd, user, strlen(user), 0) < 0) {
+            perror("Error sending");
+            exit(2);
+        }
+        memset(buffer, '\0', N * sizeof(char));
+
+        if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
+            perror("Error recievieng");
+            exit(5);
+        } else printf("%s\n", buffer);
 //
-//    strcat(pass, "PASS ");
-//    strcat(pass, password);
-//    strcat(pass, "\n");
+        strcat(pass, "PASS ");
+        strcat(pass, password);
+        strcat(pass, "\r\n");
 
+        if (send(sd, pass, strlen(pass), 0) < 0) {
+            perror("Error sending");
+            exit(2);
+        }
+        memset(buffer, '\0', N * sizeof(char));
 
-    if (send(sd, user, 1024, 0) < 0) {
-        perror("Error sending");
-        exit(2);
+        if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
+            perror("Error recievieng");
+            exit(5);
+        } else printf("%s\n", buffer);
+        connected = 1;
+    } else {
+        strcat(user, "user ");
+        strcat(user, uname);
+        strcat(user, "\n");
+
+        if (send(sd, user, 1024, 0) < 0) {
+            perror("Error sending");
+            exit(2);
+        }
+        memset(buffer, '\0', N * sizeof(char));
+
+        if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
+            perror("Error recievieng");
+            exit(5);
+        } else printf("%s\n", buffer);
+
+        connected = 1;
     }
-    memset(buffer, '\0', N * sizeof(char));
-
-    if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
-        perror("Error recievieng");
-        exit(5);
-    } else printf("%s\n", buffer);
-//
-//    if (send(sd, pass, 1024, 0) < 0) {
-//        perror("Error sending");
-//        exit(2);
-//    }
-//    memset(buffer, '\0', N * sizeof(char));
-//
-//    if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
-//        perror("Error recievieng");
-//        exit(5);
-//    } else printf("%s\n", buffer);
-    connected = 1;
 }
 
 void rmd(char *directory) {
@@ -315,6 +377,27 @@ void rmd(char *directory) {
         perror("Error recieving");
         exit(5);
     } else printf("%s \n", buffer);
+
+}
+
+void get(char *file) {
+    char buffer[N];
+    struct sockaddr_in serv;
+    int len;
+
+    memset(buffer, '\0', N * sizeof(char));
+
+    data_sock = socket(AF_INET, SOCK_STREAM, 0);
+    serv.sin_family = AF_INET;
+    serv.sin_addr.s_addr = htons(INADDR_ANY);
+    len = sizeof(serv);
+    serv.sin_port = htons(SERVER_PORT);
+    bind(sd, (struct sockaddr *) &serv, len);
+
+
+}
+
+void put(char *file) {
 
 }
 
