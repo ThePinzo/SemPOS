@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
                             printf("Password: ");
                             gets(pass);
                         }
-                        pripojit("frios2.fri.uniza.sk", uname, pass);
+                        pripojit(argv[1], uname, pass);
                     }
                 }
                 break;
@@ -166,12 +166,12 @@ void cd(char *repo) {
     char bufffer[N];
 
     memset(chd, '\0', N * sizeof(char));
-    strcat(chd, "CD ");
+    strcat(chd, "CWD ");
     strcat(chd, repo);
     strcat(chd, "\n");
 
 
-    if (send(sd, chd, strlen(chd) + 1, 0) < 0) {
+    if (send(sd, chd, strlen(chd), 0) < 0) {
         perror("Error sending");
         exit(2);
     }
@@ -205,7 +205,7 @@ void quit(void) {
 }
 
 void dir(void) {
-    char *pasv = "PORT\r\n";
+    char *pasv = "PORT 192,168,0,108,208,138\r\n";
     char *dir = "LIST\r\n";
     char buffer[N];
 
@@ -239,10 +239,10 @@ void del(char *file) {
     char buffer[N];
 
     memset(del, '\0', N * sizeof(char));
-    strcat(del, "DELETE ");
+    strcat(del, "DELE ");
     strcat(del, file);
     strcat(del, "\n");
-    if (send(sd, del, strlen(del) + 1, 0) < 0) {
+    if (send(sd, del, strlen(del), 0) < 0) {
         perror("Error sending");
         exit(2);
     }
@@ -259,7 +259,7 @@ void mkd(char *directory) {
     char buffer[N];
 
     memset(mkd, '\0', N * sizeof(char));
-    strcat(mkd, "MKDIR ");
+    strcat(mkd, "XMKD ");
     strcat(mkd, directory);
     strcat(mkd, "\n");
 
@@ -364,11 +364,11 @@ void rmd(char *directory) {
     char buffer[N];
 
     memset(rmd, '\0', N * sizeof(char));
-    strcat(rmd, "RMDIR ");
+    strcat(rmd, "XRMD ");
     strcat(rmd, directory);
     strcat(rmd, "\n");
 
-    if (send(sd, rmd, strlen(rmd) + 1, 0) < 0) {
+    if (send(sd, rmd, strlen(rmd), 0) < 0) {
         perror("Error sending");
         exit(2);
     }
@@ -382,23 +382,40 @@ void rmd(char *directory) {
 
 void get(char *file) {
     char buffer[N];
-    struct sockaddr_in serv;
-    int len;
+    char get[N];
 
+    strcat(get, "RETR ");
+    strcat(get, file);
+    strcat(get, "\r\n");
+
+    if (send(sd, get, strlen(get), 0) < 0) {
+        perror("Error sending");
+        exit(2);
+    }
     memset(buffer, '\0', N * sizeof(char));
-
-    data_sock = socket(AF_INET, SOCK_STREAM, 0);
-    serv.sin_family = AF_INET;
-    serv.sin_addr.s_addr = htons(INADDR_ANY);
-    len = sizeof(serv);
-    serv.sin_port = htons(SERVER_PORT);
-    bind(sd, (struct sockaddr *) &serv, len);
-
-
+    if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
+        perror("Error recieving");
+        exit(5);
+    } else printf("%s \n", buffer);
 }
 
 void put(char *file) {
+    char buffer[N];
+    char put[N];
 
+    strcat(put, "STOR ");
+    strcat(put, file);
+    strcat(put, "\r\n");
+
+    if (send(sd, put, strlen(put), 0) < 0) {
+        perror("Error sending");
+        exit(2);
+    }
+    memset(buffer, '\0', N * sizeof(char));
+    if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
+        perror("Error recieving");
+        exit(5);
+    } else printf("%s \n", buffer);
 }
 
 

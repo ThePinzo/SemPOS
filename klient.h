@@ -19,17 +19,17 @@
 #define N 1024
 #define NB_CMDS 11
 #define SERVER_PORT 21
-#define OPEN 0  //bez hesla/
-#define CD 1    //kk
-#define MKD 2   //kk
-#define RMD 3   //kk
-#define QUIT 4  //kk
-#define DIR 5   //kk
+#define OPEN 0  //FUNGUJE
+#define CD 1    //FUNGUJE
+#define MKD 2   //FUNGUJE
+#define RMD 3   //FUNGUJE
+#define QUIT 4  //FUNGUJE
+#define DIR 5   //NOT OK
 #define GET 6   //
 #define PUT 7   //
-#define PWD 8   //kk
-#define DEL 9   //kk
-#define HELP 10 //kk
+#define PWD 8   //FUNGUJE
+#define DEL 9   //FUNGUJE
+#define HELP 10 //FUNGUJE
 
 
 const char *PROMPT = "Pinzov a Matusov FTP>";
