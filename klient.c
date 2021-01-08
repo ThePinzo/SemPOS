@@ -6,8 +6,9 @@
 
 
 static char *prikazy[NB_CMDS] = {
-        "open", "cd", "mkd", "rmd", "quit", "dir", "get", "put", "pwd", "del", "help"
+        "open", "cd", "mkd", "rmd", "quit", "dir", "get", "put", "pwd", "del", "help", "lpwd"
 };
+
 int sd = 0;
 int data_sock = 0;
 int connected = 0;
@@ -15,13 +16,14 @@ int connected = 0;
 
 int main(int argc, char *argv[]) {
     char buffer[N], *param;
-    char uname[N], pass[N];
+    char uname[N], pass[N], domain[N];
     int j = 0;
 
     do {
         memset(buffer, '\0', N * sizeof(char));
         memset(uname, '\0', N * sizeof(char));
         memset(pass, '\0', N * sizeof(char));
+        memset(domain, '\0', N * sizeof(char));
 
         prompt();
         gets(buffer);
@@ -45,13 +47,15 @@ int main(int argc, char *argv[]) {
                 if (strcmp(buffer, "") != 0) {
                     if (connected == 1) printf("You are already connected\n");
                     else {
+                        printf("Enter domain: ");
+                        gets(domain);
                         printf("Username: ");
                         gets(uname);
                         if (strcmp(uname, "anonymous") != 0) {
                             printf("Password: ");
                             gets(pass);
                         }
-                        pripojit(argv[1], uname, pass);
+                        pripojit(domain, uname, pass);
                     }
                 }
                 break;
@@ -67,7 +71,6 @@ int main(int argc, char *argv[]) {
                     cd(param);
                 }
                 break;
-
             case (QUIT):
                 quit();
                 return 0;
@@ -117,12 +120,13 @@ int main(int argc, char *argv[]) {
             case (HELP):
                 help();
                 break;
+            case (LPWD):
+                system("pwd");
+                break;
             default:
                 help();
                 break;
         }
-
-
     } while (1);
 }
 

@@ -17,7 +17,7 @@
 #include <unistd.h>
 
 #define N 1024
-#define NB_CMDS 11
+#define NB_CMDS 12
 #define SERVER_PORT 21
 #define OPEN 0  //FUNGUJE
 #define CD 1    //FUNGUJE
@@ -30,9 +30,9 @@
 #define PWD 8   //FUNGUJE
 #define DEL 9   //FUNGUJE
 #define HELP 10 //FUNGUJE
+#define LPWD 11
 
-
-const char *PROMPT = "Pinzov a Matusov FTP>";
+const char *PROMPT = "Pinzov a Matusov FTP> ";
 
 void prompt(void);
 
