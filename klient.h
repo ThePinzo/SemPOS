@@ -17,7 +17,7 @@
 #include <unistd.h>
 
 #define N 1024
-#define NB_CMDS 16
+#define NB_CMDS 17
 #define SERVER_PORT 21
 #define OPEN 0  //FUNGUJE
 #define CD 1    //FUNGUJE
@@ -30,13 +30,14 @@
 #define PWD 8   //FUNGUJE
 #define DEL 9   //FUNGUJE
 #define HELP 10 //FUNGUJE
-#define LPWD 11 //FUNGUJE
-#define LCD 12
-#define LMKDR 13
-#define LSL 14 //FUNGUJE
-#define LDIR 15 //FUNGUJE
+#define DIRU 11 //FUNGUJE
+#define CDU 12  //FUNGUJE
+#define PWDU 13 //FUNGUJE
+#define MKDU 14 //FUNGUJE
+#define RMDU 15 //FUNGUJE
+#define DELU 16 //FUNGUJE
 
-const char *PROMPT = "Pinzov a Matusov FTP> ";
+const char *PROMPT = "Pinzov a Matusov FTP>";
 
 void prompt(void);
 
@@ -64,5 +65,19 @@ void put(char *);
 
 void send_rq(int, char []);
 
+void dirU(void);
+
+void cdU(char *);
+
+void pwdU(void);
+
+void mkdU(char *);
+
+void rmdU(char *);
+
+void delU(char *);
+
+void pasv(char *, int *);
+void sock_cr(int, char *, int);
 
 #endif //SEMPRACA_KLIENT_H
