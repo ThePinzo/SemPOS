@@ -6,9 +6,9 @@
 
 
 static char *prikazy[NB_CMDS] = {
-        "open", "cd", "mkd", "rmd", "quit", "dir", "get", "put", "pwd", "del", "help", "lpwd", "lcd", "lmkdr", "lsl", "ldir"
+        "open", "cd", "mkd", "rmd", "quit", "dir", "get", "put", "pwd", "del", "help", "dirU", "cdU", "pwdU", "mkdU",
+        "rmdU", "delU"
 };
-
 int sd = 0;
 int data_sock = 0;
 int connected = 0;
@@ -16,17 +16,13 @@ int connected = 0;
 
 int main(int argc, char *argv[]) {
     char buffer[N], *param;
-    char uname[N], pass[N], domain[N];
-    char com[N];
-
+    char uname[N], pass[N];
     int j = 0;
 
     do {
         memset(buffer, '\0', N * sizeof(char));
         memset(uname, '\0', N * sizeof(char));
         memset(pass, '\0', N * sizeof(char));
-        memset(domain, '\0', N * sizeof(char));
-        memset(com, '\0', N * sizeof(char));
 
         prompt();
         gets(buffer);
@@ -50,15 +46,19 @@ int main(int argc, char *argv[]) {
                 if (strcmp(buffer, "") != 0) {
                     if (connected == 1) printf("You are already connected\n");
                     else {
-                        printf("Enter domain: ");
-                        gets(domain);
                         printf("Username: ");
                         gets(uname);
                         if (strcmp(uname, "anonymous") != 0) {
                             printf("Password: ");
                             gets(pass);
+                            if (strcmp(pass, "") == 0) {
+                                printf("Enter your password please!\n");
+                                break;
+                            }
                         }
-                        pripojit(domain, uname, pass);
+                        if (strcmp(uname, "") != 0) {
+                            pripojit(argv[1], uname, pass);
+                        }
                     }
                 }
                 break;
@@ -71,25 +71,40 @@ int main(int argc, char *argv[]) {
                 if (connected == 0) {
                     printf("You are not connected\n");
                 } else {
-                    cd(param);
+                    if (strcmp(param, "") == 0) {
+                        printf("Enter parameter please!\n");
+                        break;
+                    } else {
+                        cd(param);
+                    }
                 }
                 break;
+
             case (QUIT):
                 quit();
                 return 0;
-                break;
             case (MKD):
                 if (connected == 0) {
                     printf("You are not connected\n");
                 } else {
-                    mkd(param);
+                    if (strcmp(param, "") == 0) {
+                        printf("Enter parameter please!\n");
+                        break;
+                    } else {
+                        mkd(param);
+                    }
                 }
                 break;
             case (RMD):
                 if (connected == 0) {
                     printf("You are not connected\n");
                 } else {
-                    rmd(param);
+                    if (strcmp(param, "") == 0) {
+                        printf("Enter parameter please!\n");
+                        break;
+                    } else {
+                        rmd(param);
+                    }
                 }
                 break;
             case (DIR):
@@ -103,67 +118,109 @@ int main(int argc, char *argv[]) {
                 if (connected == 0) {
                     printf("You are not connected\n");
                 } else {
-                    del(param);
+                    if (strcmp(param, "") == 0) {
+                        printf("Enter parameter please!\n");
+                        break;
+                    } else {
+                        del(param);
+                    }
                 }
                 break;
             case (GET):
                 if (connected == 0) {
                     printf("You are not connected\n");
                 } else {
-                    get(param);
+                    if (strcmp(param, "") == 0) {
+                        printf("Enter parameter please!\n");
+                        break;
+                    } else {
+                        get(param);
+                    }
                 }
                 break;
             case (PUT):
                 if (connected == 0) {
                     printf("You are not connected\n");
                 } else {
-                    put(param);
+                    if (strcmp(param, "") == 0) {
+                        printf("Enter parameter please!\n");
+                        break;
+                    } else {
+                        put(param);
+                    }
                 }
                 break;
             case (HELP):
                 help();
                 break;
-            case (LPWD):
-                system("pwd");
+            case (DIRU):
+                dirU();
                 break;
-            case (LCD):
-                strcpy(com, "cd ");
-                strcat(com, param);
-                system(com);
+            case (CDU):
+                if (strcmp(param, "") == 0) {
+                    printf("Enter parameter please!\n");
+                    break;
+                } else {
+                    cdU(param);
+                }
                 break;
-            case (LMKDR):
-                strcpy(com, "mkdir ");
-                strcat(com, param);
-                system(com);
+            case (PWDU):
+                pwdU();
                 break;
-            case (LSL):
-                system("ls");
+            case (RMDU):
+                if (strcmp(param, "") == 0) {
+                    printf("Enter parameter please!\n");
+                    break;
+                } else {
+                    rmdU(param);
+                }
                 break;
-            case (LDIR):
-                system("dir");
+            case (MKDU):
+                if (strcmp(param, "") == 0) {
+                    printf("Enter parameter please!\n");
+                    break;
+                } else {
+                    mkdU(param);
+                }
+                break;
+            case (DELU):
+                if (strcmp(param, "") == 0) {
+                    printf("Enter parameter please!\n");
+                    break;
+                } else {
+                    delU(param);
+                }
                 break;
             default:
                 help();
                 break;
         }
+
+
     } while (1);
 }
 
 void help(void) {
     printf("Prikazy pre pracu s klientom: \n");
+    printf("Pozor! Prikazy su case-sensitive!\n");
     printf("++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-    printf("QUIT    Zatvori ftp klienta\n");
-    printf("OPEN    Pripoji klienta ku serveru\n");
-    printf("CD      Zmeni sa pracovny adresar\n");
-    printf("PWD     Zobrazi cesta ku pracovnemu adresaru\n");
-    printf("GET     Stiahne subor zo serveru\n");
-    printf("PUT     Nahra subor na server\n");
-    printf("DEL     Vymaze subor\n");
-    printf("MKD     Vytvori adresar\n");
-    printf("RMD     Vymaze adresar\n");
-    printf("DIR     Zobrazi sa obsah pracovneho adresara\n");
-    printf("HELP    Zobrazi zoznam pouzitelnych prikazov\n");
-    printf("LPWD    Zobrazi cesta ku pracovnemu adresaru na lokalnom stroji\n");
+    printf("quit    Zatvori ftp klienta\n");
+    printf("open    Pripoji klienta ku serveru\n");
+    printf("cd      Zmeni sa pracovny adresar na serveri\n");
+    printf("pwd     Zobrazi cesta ku pracovnemu adresaru na serveri\n");
+    printf("get     Stiahne subor zo serveru\n");
+    printf("put     Nahra subor na server\n");
+    printf("del     Vymaze subor na serveri\n");
+    printf("mkd     Vytvori adresar na serveri\n");
+    printf("rmd     Vymaze adresar na serveri\n");
+    printf("dir     Zobrazi sa obsah pracovneho adresara na serveri\n");
+    printf("help    Zobrazi zoznam pouzitelnych prikazov\n");
+    printf("cdU     Zmeni sa pracovny adresar u klienta\n");
+    printf("pwdU    Zobrazi cesta ku pracovnemu adresaru u klienta\n");
+    printf("dirU    Zobrazi sa obsah pracovneho adresara u klienta\n");
+    printf("mkdU    Vytvori adresar u klienta\n");
+    printf("rmdU    Vymaze adresar u klienta\n");
+    printf("delU    Vymaze subor u klienta\n");
     printf("++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 }
 
@@ -220,17 +277,29 @@ void quit(void) {
 }
 
 void dir(void) {
-    char *pasv = "PORT **,208,138\r\n";
+    char ipAddr[32];
+    int port;
     char *dir = "LIST\r\n";
     char buffer[N];
+    int tolen;
+    struct sockaddr_in to;
+    struct hostent *host;
 
-    send_rq(sd, pasv);
+    pasv(ipAddr, &port);
 
-    memset(buffer, '\0', N * sizeof(char));
-    if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
-        perror("Error recieving");
-        exit(5);
-    } else printf("%s \n", buffer);
+    data_sock = socket(AF_INET, SOCK_STREAM, 0);
+    to.sin_family = AF_INET;
+    to.sin_addr.s_addr = htons(INADDR_ANY);
+    host = gethostbyname(ipAddr);
+    memcpy(&(to.sin_addr), host->h_addr, host->h_length);
+    tolen = sizeof(to);
+    to.sin_port = htons(port);
+
+
+    if (connect(data_sock, (struct sockaddr *) &to, tolen) < 0) {
+        perror("Error connecting socket");
+        exit(1);
+    }
 
     send_rq(sd, dir);
 
@@ -241,6 +310,21 @@ void dir(void) {
         exit(5);
     } else printf("%s \n", buffer);
 
+    bzero(buffer, sizeof(buffer));
+
+    if (recv(data_sock, buffer, sizeof(buffer), 0) < 0) {
+        perror("Error receiving");
+        exit(5);
+    } else printf("%s \n", buffer);
+
+    bzero(buffer, sizeof(buffer));
+
+    if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
+        perror("Error receiving");
+        exit(5);
+    } else printf("%s \n", buffer);
+
+    close(data_sock);
 }
 
 void del(char *file) {
@@ -404,20 +488,115 @@ void get(char *file) {
 }
 
 void put(char *file) {
-    char buffer[N];
+    char ipAddr[32];
+    int port;
     char put[N];
+    char buffer[N];
+    int tolen;
+    struct sockaddr_in to;
+    struct hostent *host;
 
     strcat(put, "STOR ");
     strcat(put, file);
     strcat(put, "\r\n");
 
-    send_rq(sd, put);
+    pasv(ipAddr, &port);
 
-    memset(buffer, '\0', N * sizeof(char));
+    data_sock = socket(AF_INET, SOCK_STREAM, 0);
+    to.sin_family = AF_INET;
+    to.sin_addr.s_addr = htons(INADDR_ANY);
+    host = gethostbyname(ipAddr);
+    memcpy(&(to.sin_addr), host->h_addr, host->h_length);
+    tolen = sizeof(to);
+    to.sin_port = htons(port);
+
+
+    if (connect(data_sock, (struct sockaddr *) &to, tolen) < 0) {
+        perror("Error connecting socket");
+        exit(1);
+    }
+
+    send_rq(sd, dir);
+
+    bzero(buffer, sizeof(buffer));
+
     if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
-        perror("Error recieving");
+        perror("Error receiving");
         exit(5);
     } else printf("%s \n", buffer);
+
+    bzero(buffer, sizeof(buffer));
+
+    if (recv(data_sock, buffer, sizeof(buffer), 0) < 0) {
+        perror("Error receiving");
+        exit(5);
+    } else printf("%s \n", buffer);
+
+    bzero(buffer, sizeof(buffer));
+
+    if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
+        perror("Error receiving");
+        exit(5);
+    } else printf("%s \n", buffer);
+
+    close(data_sock);
+}
+
+void dirU() {
+    system("dir");
+}
+
+void cdU(char *directory) {
+    char dir[N];
+    memset(dir, '\0', N * sizeof(char));
+    strcat(dir, directory);
+    chdir(dir);
+}
+
+void pwdU() {
+    system("pwd");
+}
+
+void mkdU(char *directory) {
+    char dir[N];
+    memset(dir, '\0', N * sizeof(char));
+    strcat(dir, "mkdir ");
+    strcat(dir, directory);
+    system(dir);
+}
+
+void rmdU(char *directory) {
+    char dir[N];
+    memset(dir, '\0', N * sizeof(char));
+    strcat(dir, "rmdir ");
+    strcat(dir, directory);
+    system(dir);
+}
+
+void delU(char *file) {
+    char del[N];
+    memset(del, '\0', N * sizeof(char));
+    strcat(del, "rm ");
+    strcat(del, file);
+    system(del);
+}
+
+void pasv(char *ipaddr, int *port) {
+    char *pasv = "PASV \r\n";
+    char buffer[N];
+    char *find;
+    int a, b, c, d, pa, pb;
+    send_rq(sd, pasv);
+
+    if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
+        perror("Error receiving");
+        exit(5);
+    } else printf("%s\n", buffer);
+    find = strrchr(buffer, '(');
+    sscanf(find, "(%d, %d, %d, %d, %d, %d", &a, &b, &c, &d, &pa, &pb);
+    sprintf(ipaddr, "%d.%d.%d.%d", a, b, c, d);
+    *port = pa * 256 + pb;
+
 }
 
 
