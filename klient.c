@@ -36,6 +36,10 @@ int main(int argc, char *argv[]) {
                 j = i;
                 break;
             }
+        if (j == 0 && strcmp(buffer, "open") != 0) {
+            printf("Unkown command\n");
+            j = 10;
+        }
         switch (j) {
             case (OPEN):
                 if (strcmp(buffer, "") != 0) {
@@ -101,7 +105,6 @@ int main(int argc, char *argv[]) {
                     printf("You are not connected\n");
                 } else {
                     get(param);
-
                 }
                 break;
             case (PUT):
@@ -121,7 +124,6 @@ int main(int argc, char *argv[]) {
 
 
     } while (1);
-    return 0;
 }
 
 void help(void) {
@@ -150,10 +152,8 @@ void pwd(void) {
     char buffer[N];
     char *pwd = "XPWD\r\n";
 
-    if (send(sd, pwd, strlen(pwd), 0) < 0) {
-        perror("Error sending");
-        exit(2);
-    }
+    send_rq(sd, pwd);
+
     memset(buffer, '\0', N * sizeof(char));
     if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
         perror("Error recieving");
@@ -170,11 +170,7 @@ void cd(char *repo) {
     strcat(chd, repo);
     strcat(chd, "\n");
 
-
-    if (send(sd, chd, strlen(chd), 0) < 0) {
-        perror("Error sending");
-        exit(2);
-    }
+    send_rq(sd, chd);
 
     memset(bufffer, '\0', N * sizeof(char));
     if (recv(sd, bufffer, sizeof(bufffer), 0) < 0) {
@@ -187,11 +183,7 @@ void quit(void) {
     char *quit = "QUIT\r\n";
     char buffer[N];
 
-    if (connected == 1)
-        if (send(sd, quit, strlen(quit), 0) < 0) {
-            perror("Error sending");
-            exit(2);
-        }
+    send_rq(sd, quit);
     memset(buffer, '\0', N * sizeof(char));
     if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
         perror("Error recieving");
@@ -200,19 +192,15 @@ void quit(void) {
 
     close(sd);
     sd = 0;
-    printf("Goodbye \n");
 
 }
 
 void dir(void) {
-    char *pasv = "PORT 192,168,0,108,208,138\r\n";
+    char *pasv = "PORT **,208,138\r\n";
     char *dir = "LIST\r\n";
     char buffer[N];
 
-    if (send(sd, pasv, strlen(pasv), 0) < 0) {
-        perror("Error sending");
-        exit(2);
-    }
+    send_rq(sd, pasv);
 
     memset(buffer, '\0', N * sizeof(char));
     if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
@@ -220,10 +208,7 @@ void dir(void) {
         exit(5);
     } else printf("%s \n", buffer);
 
-    if (send(sd, dir, strlen(dir), 0) < 0) {
-        perror("Error sending");
-        exit(2);
-    }
+    send_rq(sd, dir);
 
     bzero(buffer, sizeof(buffer));
 
@@ -242,10 +227,9 @@ void del(char *file) {
     strcat(del, "DELE ");
     strcat(del, file);
     strcat(del, "\n");
-    if (send(sd, del, strlen(del), 0) < 0) {
-        perror("Error sending");
-        exit(2);
-    }
+
+    send_rq(sd, del);
+
     memset(buffer, '\0', N * sizeof(char));
     if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
         perror("Error recieving");
@@ -263,10 +247,7 @@ void mkd(char *directory) {
     strcat(mkd, directory);
     strcat(mkd, "\n");
 
-    if (send(sd, mkd, strlen(mkd) + 1, 0) < 0) {
-        perror("Error sending");
-        exit(2);
-    }
+    send_rq(sd, mkd);
 
     memset(buffer, '\0', N * sizeof(char));
     if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
@@ -313,25 +294,21 @@ void pripojit(char *host_serv, char *uname, char *password) {
         strcat(user, uname);
         strcat(user, "\r\n");
 
-        if (send(sd, user, strlen(user), 0) < 0) {
-            perror("Error sending");
-            exit(2);
-        }
+        send_rq(sd, user);
+
         memset(buffer, '\0', N * sizeof(char));
 
         if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
             perror("Error recievieng");
             exit(5);
         } else printf("%s\n", buffer);
-//
+
         strcat(pass, "PASS ");
         strcat(pass, password);
         strcat(pass, "\r\n");
 
-        if (send(sd, pass, strlen(pass), 0) < 0) {
-            perror("Error sending");
-            exit(2);
-        }
+        send_rq(sd, pass);
+
         memset(buffer, '\0', N * sizeof(char));
 
         if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
@@ -344,10 +321,8 @@ void pripojit(char *host_serv, char *uname, char *password) {
         strcat(user, uname);
         strcat(user, "\n");
 
-        if (send(sd, user, 1024, 0) < 0) {
-            perror("Error sending");
-            exit(2);
-        }
+        send_rq(sd, user);
+
         memset(buffer, '\0', N * sizeof(char));
 
         if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
@@ -368,16 +343,22 @@ void rmd(char *directory) {
     strcat(rmd, directory);
     strcat(rmd, "\n");
 
-    if (send(sd, rmd, strlen(rmd), 0) < 0) {
-        perror("Error sending");
-        exit(2);
-    }
+    send_rq(sd, rmd);
+
     memset(buffer, '\0', N * sizeof(char));
     if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
         perror("Error recieving");
         exit(5);
     } else printf("%s \n", buffer);
 
+}
+
+void send_rq(int sock, char command[]) {
+
+    if (send(sock, command, strlen(command), 0) < 0) {
+        perror("Error sending");
+        exit(2);
+    }
 }
 
 void get(char *file) {
@@ -388,10 +369,9 @@ void get(char *file) {
     strcat(get, file);
     strcat(get, "\r\n");
 
-    if (send(sd, get, strlen(get), 0) < 0) {
-        perror("Error sending");
-        exit(2);
-    }
+
+    send_rq(sd, get);
+
     memset(buffer, '\0', N * sizeof(char));
     if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
         perror("Error recieving");
@@ -407,10 +387,8 @@ void put(char *file) {
     strcat(put, file);
     strcat(put, "\r\n");
 
-    if (send(sd, put, strlen(put), 0) < 0) {
-        perror("Error sending");
-        exit(2);
-    }
+    send_rq(sd, put);
+
     memset(buffer, '\0', N * sizeof(char));
     if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
         perror("Error recieving");

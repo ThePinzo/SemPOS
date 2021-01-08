@@ -58,5 +58,7 @@ void get(char *);
 
 void put(char *);
 
+void send_rq(int, char []);
+
 
 #endif //SEMPRACA_KLIENT_H
