@@ -6,7 +6,7 @@
 
 
 static char *prikazy[NB_CMDS] = {
-        "open", "cd", "mkd", "rmd", "quit", "dir", "get", "put", "pwd", "del", "help", "lpwd"
+        "open", "cd", "mkd", "rmd", "quit", "dir", "get", "put", "pwd", "del", "help", "lpwd", "lcd", "lmkdr", "lsl", "ldir"
 };
 
 int sd = 0;
@@ -17,6 +17,8 @@ int connected = 0;
 int main(int argc, char *argv[]) {
     char buffer[N], *param;
     char uname[N], pass[N], domain[N];
+    char com[N];
+
     int j = 0;
 
     do {
@@ -24,6 +26,7 @@ int main(int argc, char *argv[]) {
         memset(uname, '\0', N * sizeof(char));
         memset(pass, '\0', N * sizeof(char));
         memset(domain, '\0', N * sizeof(char));
+        memset(com, '\0', N * sizeof(char));
 
         prompt();
         gets(buffer);
@@ -123,6 +126,22 @@ int main(int argc, char *argv[]) {
             case (LPWD):
                 system("pwd");
                 break;
+            case (LCD):
+                strcpy(com, "cd ");
+                strcat(com, param);
+                system(com);
+                break;
+            case (LMKDR):
+                strcpy(com, "mkdir ");
+                strcat(com, param);
+                system(com);
+                break;
+            case (LSL):
+                system("ls");
+                break;
+            case (LDIR):
+                system("dir");
+                break;
             default:
                 help();
                 break;
@@ -144,6 +163,7 @@ void help(void) {
     printf("RMD     Vymaze adresar\n");
     printf("DIR     Zobrazi sa obsah pracovneho adresara\n");
     printf("HELP    Zobrazi zoznam pouzitelnych prikazov\n");
+    printf("LPWD    Zobrazi cesta ku pracovnemu adresaru na lokalnom stroji\n");
     printf("++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 }
 
