@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
                 if (connected == 0) {
                     printf("You are not connected\n");
                 } else {
-                    if (strcmp(param, "") == 0) {
+                    if (param == NULL || strcmp(param, "") == 0) {
                         printf("Enter parameter please!\n");
                         break;
                     } else {
@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
                 if (connected == 0) {
                     printf("You are not connected\n");
                 } else {
-                    if (strcmp(param, "") == 0) {
+                    if (param == NULL || strcmp(param, "") == 0) {
                         printf("Enter parameter please!\n");
                         break;
                     } else {
@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
                 if (connected == 0) {
                     printf("You are not connected\n");
                 } else {
-                    if (strcmp(param, "") == 0) {
+                    if (param == NULL || strcmp(param, "") == 0) {
                         printf("Enter parameter please!\n");
                         break;
                     } else {
@@ -118,7 +118,7 @@ int main(int argc, char *argv[]) {
                 if (connected == 0) {
                     printf("You are not connected\n");
                 } else {
-                    if (strcmp(param, "") == 0) {
+                    if (param == NULL || strcmp(param, "") == 0) {
                         printf("Enter parameter please!\n");
                         break;
                     } else {
@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
                 if (connected == 0) {
                     printf("You are not connected\n");
                 } else {
-                    if (strcmp(param, "") == 0) {
+                    if (param == NULL || strcmp(param, "") == 0) {
                         printf("Enter parameter please!\n");
                         break;
                     } else {
@@ -142,7 +142,7 @@ int main(int argc, char *argv[]) {
                 if (connected == 0) {
                     printf("You are not connected\n");
                 } else {
-                    if (strcmp(param, "") == 0) {
+                    if (param == NULL || strcmp(param, "") == 0) {
                         printf("Enter parameter please!\n");
                         break;
                     } else {
@@ -157,7 +157,7 @@ int main(int argc, char *argv[]) {
                 dirU();
                 break;
             case (CDU):
-                if (strcmp(param, "") == 0) {
+                if (param == NULL || strcmp(param, "") == 0) {
                     printf("Enter parameter please!\n");
                     break;
                 } else {
@@ -168,7 +168,7 @@ int main(int argc, char *argv[]) {
                 pwdU();
                 break;
             case (RMDU):
-                if (strcmp(param, "") == 0) {
+                if (param == NULL || strcmp(param, "") == 0) {
                     printf("Enter parameter please!\n");
                     break;
                 } else {
@@ -176,7 +176,7 @@ int main(int argc, char *argv[]) {
                 }
                 break;
             case (MKDU):
-                if (strcmp(param, "") == 0) {
+                if (param == NULL || strcmp(param, "") == 0) {
                     printf("Enter parameter please!\n");
                     break;
                 } else {
@@ -184,7 +184,7 @@ int main(int argc, char *argv[]) {
                 }
                 break;
             case (DELU):
-                if (strcmp(param, "") == 0) {
+                if (param == NULL || strcmp(param, "") == 0) {
                     printf("Enter parameter please!\n");
                     break;
                 } else {
@@ -325,13 +325,14 @@ void dir(void) {
     } else printf("%s \n", buffer);
 
     bzero(buffer, sizeof(buffer));
+    close(data_sock);
 
     if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
         perror("Error receiving");
         exit(5);
     } else printf("%s \n", buffer);
 
-    close(data_sock);
+
 }
 
 void del(char *file) {
