@@ -24,7 +24,7 @@
 #define MKD 2   //FUNGUJE
 #define RMD 3   //FUNGUJE
 #define QUIT 4  //FUNGUJE
-#define DIR 5   //NOT OK
+#define DIR 5   //FUNGUJE
 #define GET 6   //
 #define PUT 7   //
 #define PWD 8   //FUNGUJE
