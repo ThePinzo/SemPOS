@@ -10,7 +10,7 @@ static char *prikazy[NB_CMDS] = {
         "rmdU", "delU", "ls"
 };
 int sd = 0;
-int data_sock = 0;
+int dat_soc = 0;
 int connected = 0;
 
 
@@ -221,6 +221,7 @@ void help(void) {
     printf("mkd     Vytvori adresar na serveri\n");
     printf("rmd     Vymaze adresar na serveri\n");
     printf("dir     Zobrazi sa obsah pracovneho adresara na serveri\n");
+    printf("ls      Zobrazi sa obsah pracovneho adresara na serveri\n");
     printf("help    Zobrazi zoznam pouzitelnych prikazov\n");
     printf("cdU     Zmeni sa pracovny adresar u klienta\n");
     printf("pwdU    Zobrazi cesta ku pracovnemu adresaru u klienta\n");
@@ -294,7 +295,7 @@ void dir(void) {
 
     pasv(ipAddr, &port);
 
-    data_sock = socket(AF_INET, SOCK_STREAM, 0);
+    dat_soc = socket(AF_INET, SOCK_STREAM, 0);
     to.sin_family = AF_INET;
     to.sin_addr.s_addr = htons(INADDR_ANY);
     host = gethostbyname(ipAddr);
@@ -303,7 +304,7 @@ void dir(void) {
     to.sin_port = htons(port);
 
 
-    if (connect(data_sock, (struct sockaddr *) &to, tolen) < 0) {
+    if (connect(dat_soc, (struct sockaddr *) &to, tolen) < 0) {
         perror("Error connecting socket");
         exit(1);
     }
@@ -319,13 +320,13 @@ void dir(void) {
 
     bzero(buffer, sizeof(buffer));
 
-    if (recv(data_sock, buffer, sizeof(buffer), 0) < 0) {
+    if (recv(dat_soc, buffer, sizeof(buffer), 0) < 0) {
         perror("Error receiving");
         exit(5);
     } else printf("%s \n", buffer);
 
     bzero(buffer, sizeof(buffer));
-    close(data_sock);
+    close(dat_soc);
 
     if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
         perror("Error receiving");
@@ -495,7 +496,7 @@ void get(char *file) {
 
     pasv(ipAddr, &port);
 
-    data_sock = socket(AF_INET, SOCK_STREAM, 0);
+    dat_soc = socket(AF_INET, SOCK_STREAM, 0);
     to.sin_family = AF_INET;
     to.sin_addr.s_addr = htons(INADDR_ANY);
     host = gethostbyname(ipAddr);
@@ -503,7 +504,7 @@ void get(char *file) {
     tolen = sizeof(to);
     to.sin_port = htons(port);
 
-    if (connect(data_sock, (struct sockaddr *) &to, tolen) < 0) {
+    if (connect(dat_soc, (struct sockaddr *) &to, tolen) < 0) {
         perror("Error connecting socket");
         exit(1);
     }
@@ -519,7 +520,7 @@ void get(char *file) {
 
     bzero(buffer, sizeof(buffer));
 
-    if(recv(data_sock, buffer, sizeof(buffer), 0) < 0) {
+    if(recv(dat_soc, buffer, sizeof(buffer), 0) < 0) {
         perror("Error receiving");
         exit(5);
     }
@@ -529,7 +530,7 @@ void get(char *file) {
     fwrite(buffer, sizeof(char), strlen(buffer) , fd);
 
     fclose(fd);
-    close(data_sock);
+    close(dat_soc);
 
     bzero(buffer, sizeof(buffer));
 
@@ -557,7 +558,7 @@ void put(char *file) {
 
     pasv(ipAddr, &port);
 
-    data_sock = socket(AF_INET, SOCK_STREAM, 0);
+    dat_soc = socket(AF_INET, SOCK_STREAM, 0);
     to.sin_family = AF_INET;
     to.sin_addr.s_addr = htons(INADDR_ANY);
     host = gethostbyname(ipAddr);
@@ -565,7 +566,7 @@ void put(char *file) {
     tolen = sizeof(to);
     to.sin_port = htons(port);
 
-    if (connect(data_sock, (struct sockaddr *) &to, tolen) < 0) {
+    if (connect(dat_soc, (struct sockaddr *) &to, tolen) < 0) {
         perror("Error connecting socket");
         exit(1);
     }
@@ -585,10 +586,10 @@ void put(char *file) {
 
     fread(buffer, sizeof(char), N, fd);
 
-    send_rq(data_sock, buffer);
+    send_rq(dat_soc, buffer);
 
     fclose(fd);
-    close(data_sock);
+    close(dat_soc);
 
     bzero(buffer, sizeof(buffer));
 
@@ -667,7 +668,7 @@ void ls(void) {
 
     pasv(ipAddr, &port);
 
-    data_sock = socket(AF_INET, SOCK_STREAM, 0);
+    dat_soc = socket(AF_INET, SOCK_STREAM, 0);
     to.sin_family = AF_INET;
     to.sin_addr.s_addr = htons(INADDR_ANY);
     host = gethostbyname(ipAddr);
@@ -676,7 +677,7 @@ void ls(void) {
     to.sin_port = htons(port);
 
 
-    if (connect(data_sock, (struct sockaddr *) &to, tolen) < 0) {
+    if (connect(dat_soc, (struct sockaddr *) &to, tolen) < 0) {
         perror("Error connecting socket");
         exit(1);
     }
@@ -692,7 +693,7 @@ void ls(void) {
 
     bzero(buffer, sizeof(buffer));
 
-    if (recv(data_sock, buffer, sizeof(buffer), 0) < 0) {
+    if (recv(dat_soc, buffer, sizeof(buffer), 0) < 0) {
         perror("Error receiving");
         exit(5);
     } else printf("%s \n", buffer);
@@ -704,7 +705,7 @@ void ls(void) {
         exit(5);
     } else printf("%s \n", buffer);
 
-    close(data_sock);
+    close(dat_soc);
 }
 
 

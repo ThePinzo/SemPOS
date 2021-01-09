@@ -81,6 +81,5 @@ void rmdU(char *);
 void delU(char *);
 
 void pasv(char *, int *);
-void sock_cr(int, char *, int);
 
 #endif //SEMPRACA_KLIENT_H
