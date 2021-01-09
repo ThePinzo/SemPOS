@@ -7,7 +7,7 @@
 
 static char *prikazy[NB_CMDS] = {
         "open", "cd", "mkd", "rmd", "quit", "dir", "get", "put", "pwd", "del", "help", "dirU", "cdU", "pwdU", "mkdU",
-        "rmdU", "delU"
+        "rmdU", "delU", "ls"
 };
 int sd = 0;
 int data_sock = 0;
@@ -189,6 +189,13 @@ int main(int argc, char *argv[]) {
                     break;
                 } else {
                     delU(param);
+                }
+                break;
+            case (LS):
+                if (connected == 0) {
+                    printf("You are not connected\n");
+                } else {
+                    ls();
                 }
                 break;
             default:
@@ -470,19 +477,63 @@ void send_rq(int sock, char command[]) {
 }
 
 void get(char *file) {
-    char buffer[N];
+    char ipAddr[32];
+    int port;
     char get[N];
+    char buffer[N];
+    int tolen;
+    FILE* fd;
+    struct sockaddr_in to;
+    struct hostent *host;
+
+    memset(get, '\0', N * sizeof(char));
 
     strcat(get, "RETR ");
     strcat(get, file);
     strcat(get, "\r\n");
 
+    pasv(ipAddr, &port);
+
+    data_sock = socket(AF_INET, SOCK_STREAM, 0);
+    to.sin_family = AF_INET;
+    to.sin_addr.s_addr = htons(INADDR_ANY);
+    host = gethostbyname(ipAddr);
+    memcpy(&(to.sin_addr), host->h_addr, host->h_length);
+    tolen = sizeof(to);
+    to.sin_port = htons(port);
+
+    if (connect(data_sock, (struct sockaddr *) &to, tolen) < 0) {
+        perror("Error connecting socket");
+        exit(1);
+    }
 
     send_rq(sd, get);
 
-    memset(buffer, '\0', N * sizeof(char));
+    bzero(buffer, sizeof(buffer));
+
     if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
-        perror("Error recieving");
+        perror("Error receiving");
+        exit(5);
+    } else printf("%s \n", buffer);
+
+    bzero(buffer, sizeof(buffer));
+
+    if(recv(data_sock, buffer, sizeof(buffer), 0) < 0) {
+        perror("Error receiving");
+        exit(5);
+    }
+
+    fd = fopen(file, "w");
+
+    fwrite(buffer, sizeof(char), strlen(buffer) , fd);
+
+    fclose(fd);
+    close(data_sock);
+
+    bzero(buffer, sizeof(buffer));
+
+    if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
+        perror("Error receiving");
         exit(5);
     } else printf("%s \n", buffer);
 }
@@ -493,8 +544,11 @@ void put(char *file) {
     char put[N];
     char buffer[N];
     int tolen;
+    FILE* fd;
     struct sockaddr_in to;
     struct hostent *host;
+
+    memset(put, '\0', N * sizeof(char));
 
     strcat(put, "STOR ");
     strcat(put, file);
@@ -510,13 +564,12 @@ void put(char *file) {
     tolen = sizeof(to);
     to.sin_port = htons(port);
 
-
     if (connect(data_sock, (struct sockaddr *) &to, tolen) < 0) {
         perror("Error connecting socket");
         exit(1);
     }
 
-    send_rq(sd, dir);
+    send_rq(sd, put);
 
     bzero(buffer, sizeof(buffer));
 
@@ -527,19 +580,22 @@ void put(char *file) {
 
     bzero(buffer, sizeof(buffer));
 
-    if (recv(data_sock, buffer, sizeof(buffer), 0) < 0) {
-        perror("Error receiving");
-        exit(5);
-    } else printf("%s \n", buffer);
+    fd = fopen(file, "r");
 
-    bzero(buffer, sizeof(buffer));
+    fread(buffer, sizeof(char), N, fd);
 
-    if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
-        perror("Error receiving");
-        exit(5);
-    } else printf("%s \n", buffer);
+    send_rq(data_sock, buffer);
 
+    fclose(fd);
     close(data_sock);
+
+    bzero(buffer, sizeof(buffer));
+
+    if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
+        perror("Error receiving");
+        exit(5);
+    } else printf("%s \n", buffer);
+
 }
 
 void dirU() {
@@ -598,6 +654,58 @@ void pasv(char *ipaddr, int *port) {
     *port = pa * 256 + pb;
 
 }
+
+void ls(void) {
+    char ipAddr[32];
+    int port;
+    char *ls = "NLST\r\n";
+    char buffer[N];
+    int tolen;
+    struct sockaddr_in to;
+    struct hostent *host;
+
+    pasv(ipAddr, &port);
+
+    data_sock = socket(AF_INET, SOCK_STREAM, 0);
+    to.sin_family = AF_INET;
+    to.sin_addr.s_addr = htons(INADDR_ANY);
+    host = gethostbyname(ipAddr);
+    memcpy(&(to.sin_addr), host->h_addr, host->h_length);
+    tolen = sizeof(to);
+    to.sin_port = htons(port);
+
+
+    if (connect(data_sock, (struct sockaddr *) &to, tolen) < 0) {
+        perror("Error connecting socket");
+        exit(1);
+    }
+
+    send_rq(sd, ls);
+
+    bzero(buffer, sizeof(buffer));
+
+    if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
+        perror("Error receiving");
+        exit(5);
+    } else printf("%s \n", buffer);
+
+    bzero(buffer, sizeof(buffer));
+
+    if (recv(data_sock, buffer, sizeof(buffer), 0) < 0) {
+        perror("Error receiving");
+        exit(5);
+    } else printf("%s \n", buffer);
+
+    bzero(buffer, sizeof(buffer));
+
+    if (recv(sd, buffer, sizeof(buffer), 0) < 0) {
+        perror("Error receiving");
+        exit(5);
+    } else printf("%s \n", buffer);
+
+    close(data_sock);
+}
+
 
 
 
